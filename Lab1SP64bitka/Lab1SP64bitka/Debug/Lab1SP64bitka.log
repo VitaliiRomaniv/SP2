@@ -1,0 +1,7 @@
+﻿  Assembling calc.asm...
+calc.asm(9): error A2006: undefined symbol : rsp
+calc.asm(14): error A2006: undefined symbol : r12d
+calc.asm(15): error A2006: undefined symbol : rcx
+calc.asm(18): error A2006: undefined symbol : r12d
+calc.asm(19): error A2006: undefined symbol : rsp
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\BuildCustomizations\masm.targets(70,5): error MSB3721: The command "ml.exe /c /nologo /Zi /Fo"Debug\calc.obj" /W3 /errorReport:prompt  /Tacalc.asm" exited with code 1.
