@@ -16,43 +16,42 @@ calc PROC
  finit
  fld dword ptr[ebp+16]   ;load c
  fcom dword ptr[ebp+20]  ;c - d
- fstsw ax				
+ fstsw ax				 ;save flags in ax
  sahf
+
  ja _calculate_c_abov_d  ;if c > d goto _calculate_c_abov_d
 						 ;else skip this jamp
 
- fld dword ptr[ebp + 20]
- fsub
- fadd const_1
- fst temp_res
- fld qword ptr[ebp + 8]
- fld dword ptr[ebp + 20]
- fdiv
- fadd const_4
- fptan
- fld dword ptr[ebp + 20]
- fadd ST, ST(2)
- fld temp_res
- fdiv
+ fsub dword ptr[ebp + 20] ;c - d result save to ST(0)
+ fadd const_1			  ;c - d + 1 save to ST(0)
+ fstp temp_res			  ;save temp result and pop out
+						  ;ST(0)
 
- jmp _to_return
+ fld dword ptr[ebp + 20]  ;load d 
+ fdiv qword ptr[ebp + 8]  ;d/a save to ST(0)
+ fadd const_4			  ;d/a + 4 save to ST(0)
+ fptan					  ;tan(d/a+4) save to ST(1)
+ fstp const_4			  ;pop up 1  from ST(0)
+ fadd dword ptr[ebp + 20] ;tan(d/a+4)+d save to ST(0)
+ fdiv dword ptr [temp_res];(tan(d/a+4)+d)/(c - d + 1)
+ jmp _to_return			  ;go to return result
+
  _calculate_c_abov_d:
- fmul const_4
- fld  qword ptr[ebp + 8]
- fsub ST, ST(1)
- fsub const_1
- fst temp_res
- fld qword ptr[ebp + 8]
- fld dword ptr[ebp + 20]
- fmul
- fptan
 
- fld dword ptr[ebp + 16]
- fdiv const_31
- fadd ST, ST(2)
-
- fld temp_res
- fdivr
+ fmul const_4			 ;c*4 save to ST(0)
+ fsubr qword ptr[ebp+8]	 ;a-(c*4) save to ST(0)
+ fsub const_1			 ;a-(c*4)-1
+ fstp temp_res			 ;save temp result and pop out
+						 ;ST(0)
+ fld dword ptr[ebp+16]	 ;load c
+ fdiv const_31			 ;c/31 save to ST(0)
+ fstp const_31			 ;save result and pop out ST(0)
+ fld qword ptr[ebp+8]	 ;load a to ST(0)
+ fmul dword ptr[ebp+20]  ;a*d
+ fptan					 ;tan(a*d)
+ fstp const_1			 ;POP OUT ST(0)
+ fadd const_31			 ;tan(a*d)+c/31
+ fdivr temp_res			 ;(a-(c*4)-1)/(tan(a*d)+c/31)
 
 _to_return:
  pop ebp
